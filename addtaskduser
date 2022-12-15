@@ -20,7 +20,7 @@ taskd add user "${TASKORG}" "${TASKNAME}"
 mkdir -p pki && cd pki
 TASKFILE="${TASKNAME}_${TASKORG}"
 
-certtool --generate-privkey --key-type=ed25519 --outfile="${TASKFILE}.key.pem"
+certtool --generate-privkey --bits=4096 --outfile="${TASKFILE}.key.pem"
 
 certtool -i --infile ../ca.cert.pem | sed -n -e 's/\s\+Subject:.*=/cn = /p' > client.info
 echo "expiration_days = -1" >> client.info

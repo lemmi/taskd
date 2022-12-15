@@ -18,7 +18,7 @@ generate_certs() {
 		echo "cn = ${TASKDHOSTNAME}" >> ca.info
 		echo "expiration_days = -1" >> ca.info
 		echo "ca" >> ca.info
-		certtool --generate-privkey --key-type=ed25519 --outfile=ca.key.pem
+		certtool --generate-privkey --bits=4096 --outfile=ca.key.pem
 		certtool --generate-self-signed --load-privkey ca.key.pem --template ca.info --outfile ca.cert.pem
 		rm ca.info
 
@@ -27,7 +27,7 @@ generate_certs() {
 		echo "tls_www_server" >> server.info
 		echo "encryption_key" >> server.info
 		echo "signing_key" >> server.info
-		certtool --generate-privkey --key-type=ed25519 --outfile=server.key.pem
+		certtool --generate-privkey --bits=4096 --outfile=server.key.pem
 		certtool --generate-self-signed --load-privkey server.key.pem --template server.info --load-ca-privkey ca.key.pem --outfile server.cert.pem
 		rm server.info
 

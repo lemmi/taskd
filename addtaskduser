@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+umask 077
+
+read -p "Name: " TASKNAME
+read -p "Organisation: " TASKORG
+
+if grep -q -r "user=${TASKNAME}" "orgs/${TASKORG}"; then
+	echo "${TASKNAME} already exists in ${TASKORG}"
+	exit 1
+fi
+
+if [ ! -d "orgs/${TASKORG}" ]; then
+	taskd add org "${TASKORG}"
+fi
+
+taskd add user "${TASKORG}" "${TASKNAME}"
+
+mkdir -p pki && cd pki
+TASKFILE="${TASKNAME}_${TASKORG}"
+
+certtool --generate-privkey --key-type=ed25519 --outfile="${TASKFILE}.key.pem"
+
+certtool -i --infile ../ca.cert.pem | sed -n -e 's/\s\+Subject:.*=/cn = /p' > client.info
+echo "expiration_days = -1" >> client.info
+echo "tls_www_client" >> client.info
+echo "encryption_key" >> client.info
+echo "signing_key" >> client.info
+
+certtool --generate-certificate --load-privkey "${TASKFILE}.key.pem" --load-ca-certificate ../ca.cert.pem --load-ca-privkey ../ca.key.pem --template client.info --outfile "${TASKFILE}.cert.pem"
+rm client.info

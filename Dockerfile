@@ -1,6 +1,6 @@
 FROM ghcr.io/void-linux/void-linux:latest-thin-x86_64
 
-RUN xbps-install -Suy xbps && xbps-install -uy shadow gnutls-tools catatonit taskd
+RUN --mount=type=tmpfs,target=/var/cache/xbps xbps-install -Suy xbps && xbps-install -uy shadow gnutls-tools catatonit taskd
 
 USER taskd:taskd
 
